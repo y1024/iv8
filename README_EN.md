@@ -103,7 +103,7 @@ iv8 provides an extensive browser API emulation layer on top of the V8 engine, c
 | **CSS & CSSOM** | CSSStyleSheet, 25+ CSSRule subclasses, CSSStyleDeclaration, CSS Typed OM (CSSUnitValue / CSSMath\*), Highlight API |
 | **Event System** | EventTarget / Event inheritance chain, 80+ event types (UI / Mouse / Pointer / Keyboard / Touch / Drag / Clipboard / Animation, etc.) |
 | **Window & Navigator** | Window, Location, History, Navigator, Screen, Performance API, Navigation API |
-| **Network** | XMLHttpRequest, Fetch API (Request / Response / Headers), Streams, WebSocket, WebTransport, Beacon. XHR / fetch responses injected via `add_resource`, giving users full control over real request details (proxy / TLS fingerprint / cookie pool) |
+| **Network** | XMLHttpRequest, Fetch API (Request / Response / Headers), Streams, WebSocket, WebTransport, Beacon. The Community Edition does not include a built-in real HTTP/HTTPS transport; XHR / fetch / external resources receive responses via `add_resource` or `page.load.resources`, giving users full control over real request details (proxy / TLS fingerprint / cookie pool) |
 | **Encoding & File** | TextEncoder / Decoder, Blob, File, FileReader, URL / URLSearchParams, File System Access |
 | **Storage** | localStorage, sessionStorage, CookieStore, IndexedDB, Storage Buckets |
 | **Crypto** | `crypto.getRandomValues`, SubtleCrypto (AES-GCM / AES-CBC / RSA-OAEP / RSA-PSS / ECDH / ECDSA / HMAC / HKDF / PBKDF2 / digest algorithms, etc.) |
@@ -284,6 +284,8 @@ with iv8.JSContext(time_mode="logical") as ctx:
 | `system` | Anchored to system time; `Date.now()` reflects real elapsed time during JS execution | Time-sensitive scenarios (PoW, time-delta checks) |
 
 ### 5. Network Request Interception
+
+> **Community Edition network boundary:** The Community Edition does not directly send real HTTP/HTTPS requests and does not include the Chromium network transport stack. XHR / fetch / external resources match responses from the offline bundle by default; real requests should be performed by the user's Python HTTP client and then injected via `add_resource()` or `page.load.resources`. The Pro Edition provides a real protocol stack built from a deeply trimmed Chromium net module.
 
 `add_resource()` and the `resources` parameter of `page.load` write into the same offline resource bundle.
 During HTML parsing, `<script src>` / `<link href>` / CSS `@import`, as well as runtime XHR / fetch, all match against this bundle.

@@ -107,7 +107,7 @@ iv8 在 V8 引擎之上提供广泛的浏览器 API 模拟层，覆盖以下 Web
 | **CSS & CSSOM** | CSSStyleSheet、25+ CSSRule 子类、CSSStyleDeclaration、CSS Typed OM（CSSUnitValue / CSSMath\*）、Highlight API |
 | **事件系统** | EventTarget / Event 继承链，80+ 事件类型（UI / Mouse / Pointer / Keyboard / Touch / Drag / Clipboard / Animation 等） |
 | **Window & Navigator** | Window、Location、History、Navigator、Screen、Performance API、Navigation API |
-| **网络** | XMLHttpRequest、Fetch API（Request / Response / Headers）、Streams、WebSocket、WebTransport、Beacon。XHR / fetch 通过 `add_resource` 注入响应，由用户决定真实请求细节（代理 / TLS 指纹 / cookie 池） |
+| **网络** | XMLHttpRequest、Fetch API（Request / Response / Headers）、Streams、WebSocket、WebTransport、Beacon。社区版不内置真实网络传输栈；XHR / fetch / 外联资源默认通过 `add_resource` 或 `page.load.resources` 注入响应，由用户决定真实请求细节（代理 / TLS 指纹 / cookie 池） |
 | **编码 & 文件** | TextEncoder / Decoder、Blob、File、FileReader、URL / URLSearchParams、File System Access |
 | **存储** | localStorage、sessionStorage、CookieStore、IndexedDB、Storage Buckets |
 | **加密** | `crypto.getRandomValues`、SubtleCrypto（AES-GCM / AES-CBC / RSA-OAEP / RSA-PSS / ECDH / ECDSA / HMAC / HKDF / PBKDF2 / 摘要算法等） |
@@ -288,6 +288,8 @@ with iv8.JSContext(time_mode="logical") as ctx:
 | `system` | 系统时间锚定，JS 执行期间 Date.now() 反映真实耗时 | 时间敏感场景（POW、时间差校验） |
 
 ### 5. 网络请求拦截
+
+> **社区版网络边界：** 社区版不直接发起真实 HTTP/HTTPS 请求，也不内置 Chromium 网络传输栈。XHR / fetch / 外联资源默认从离线 bundle 匹配响应；真实请求需由 Python 侧 HTTP 客户端完成，再通过 `add_resource()` 或 `page.load.resources` 注入。Pro 版提供基于 Chromium net 深度裁剪的真实网络协议栈。
 
 `add_resource()` 和 `page.load` 的 `resources` 参数写入同一个离线资源 bundle，
 HTML 解析期的 `<script src>` / `<link href>` / CSS `@import`，以及运行期的 XHR / fetch 均会从中匹配。
