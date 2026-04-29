@@ -1,18 +1,16 @@
 """
-iv8 函数 hook 与伪装
+iv8 函数伪装
 
 演示内容：
   - wrapNative(fn, name) — 将 JS 函数伪装为原生函数
-  - hookNative(api, hook) — 拦截原生 API 属性访问（getter 级别 hook）
   - Function.prototype.toString 检测绕过
 
 ---
 
-iv8 Function Hook & Native Disguise
+iv8 Function Native Disguise
 
 Demonstrates:
   - wrapNative(fn, name) — Disguise a JS function as a native function
-  - hookNative(api, hook) — Intercept native API property access (getter-level hook)
   - Function.prototype.toString detection bypass
 """
 
@@ -75,36 +73,7 @@ with iv8.JSContext() as ctx:
 
 
 print("\n" + "=" * 60)
-print("4. hookNative — getter 级属性拦截")
-print("=" * 60)
-
-with iv8.JSContext() as ctx:
-    result = ctx.eval("""
-        var hookLog = [];
-
-        // getter 级 hook：无参数，通过 this 获取原始对象
-        window.__iv8__.hookNative('Window.window', function() {
-            hookLog.push('window getter intercepted');
-            return this;  // 透传原始 window 引用
-        });
-
-        // 访问 window.window 触发 hook
-        var w = window.window;
-
-        ({
-            hookTriggered: hookLog.length > 0,
-            log: hookLog,
-            preserved: w === self
-        })
-    """, to_py=True)
-
-    print(f"hook 触发: {result['hookTriggered']}")
-    print(f"拦截日志: {result['log']}")
-    print(f"行为透明 (window 引用正确): {result['preserved']}")
-
-
-print("\n" + "=" * 60)
-print("5. 综合: 反检测验证")
+print("4. 综合: 反检测验证")
 print("=" * 60)
 
 with iv8.JSContext() as ctx:

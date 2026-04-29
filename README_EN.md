@@ -31,7 +31,7 @@ The Python–V8 interop layer draws on the design of [STPyV8](https://github.com
 | **DevTools Remote Debugging** | Breakpoints, API access breakpoints, Elements / Application panels; built-in anti-debug protection (`debugger;` disabled) |
 | **API Monitoring** | Debug mode auto-records browser API access chains and JS built-in reflection paths to locate environment probing logic |
 | **Trusted Input Events** | Dispatches `isTrusted=true` mouse / pointer events (click / mousedown / pointerdown, etc.) |
-| **Function Disguise & Hook** | `wrapNative` disguises as `[native code]`; `hookNative` intercepts in-place at C++ layer, function identity unchanged |
+| **Function Disguise** | `wrapNative` disguises JS functions as `[native code]`, reducing observable differences introduced by local patches |
 
 ## Architecture Overview
 
@@ -412,7 +412,7 @@ with iv8.JSContext() as ctx:
     print(ctx.eval("clicked"))  # True
 ```
 
-### 8. Function Disguise & Hooking
+### 8. Function Disguise
 
 ```python
 with iv8.JSContext() as ctx:
@@ -422,8 +422,6 @@ with iv8.JSContext() as ctx:
     print(ctx.eval("myFunc.toString()"))     # "function myFunc() { [native code] }"
     print(ctx.eval("myFunc(21)"))            # 42
 
-    # hookNative — Intercept API property access at the C++ layer in-place
-    ctx.eval("window.__iv8__.hookNative('Window.window', function() { return this; })")
 ```
 
 ### 9. Python ↔ JS Interop
@@ -509,7 +507,6 @@ This object is designed to be "undetectable" (`typeof window.__iv8__ === "undefi
 | `__iv8__.input.dispatchPointerEvent(init)` | Dispatch trusted pointer events |
 | `__iv8__.netLog.entries` | Captured network request log array |
 | `__iv8__.wrapNative(fn, name)` | Disguise a JS function as a native function |
-| `__iv8__.hookNative(api, hook)` | In-place hook an existing API |
 | `__iv8__.help()` | Print all available utilities and descriptions |
 
 ---

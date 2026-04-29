@@ -35,7 +35,7 @@ Python 与 V8 的互操作层参考了 [STPyV8](https://github.com/cloudflare/st
 | **DevTools 远程调试** | 断点、API 访问断点、Elements / Application 面板；内置反调试保护（`debugger;` 已禁用） |
 | **API 监控** | debug 模式自动记录浏览器 API 访问链路与 JS 内置反射路径，定位环境探测逻辑 |
 | **可信输入事件** | 派发 `isTrusted=true` 的鼠标 / 指针事件（click / mousedown / pointerdown 等） |
-| **函数伪装与 Hook** | `wrapNative` 伪装为 `[native code]`，`hookNative` 在 C++ 层原地拦截，函数 identity 不变 |
+| **函数伪装** | `wrapNative` 将 JS 函数伪装为 `[native code]`，降低临时补丁的可观测差异 |
 
 ## 架构概览
 
@@ -416,7 +416,7 @@ with iv8.JSContext() as ctx:
     print(ctx.eval("clicked"))  # True
 ```
 
-### 8. 函数伪装与 Hook
+### 8. 函数伪装
 
 ```python
 with iv8.JSContext() as ctx:
@@ -426,8 +426,6 @@ with iv8.JSContext() as ctx:
     print(ctx.eval("myFunc.toString()"))     # "function myFunc() { [native code] }"
     print(ctx.eval("myFunc(21)"))            # 42
 
-    # hookNative — C++ 层原地拦截 API 属性访问
-    ctx.eval("window.__iv8__.hookNative('Window.window', function() { return this; })")
 ```
 
 ### 9. Python ↔ JS 互调
@@ -513,7 +511,6 @@ with iv8.JSContext() as ctx:
 | `__iv8__.input.dispatchPointerEvent(init)` | 派发可信指针事件 |
 | `__iv8__.netLog.entries` | 捕获的网络请求日志数组 |
 | `__iv8__.wrapNative(fn, name)` | 将 JS 函数伪装为原生函数 |
-| `__iv8__.hookNative(api, hook)` | 原地 hook 已有 API |
 | `__iv8__.help()` | 打印所有可用工具及说明 |
 
 ---
