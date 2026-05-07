@@ -120,7 +120,7 @@ with iv8.JSContext(environment=environment, config={"timezone": "Asia/Shanghai"}
     final_cookie = entry.get('cookieHeader') or cookies_str
     api_url = f"{environment['location']['origin']}{entry['url']}" if entry['url'].startswith('/') else entry['url']
 
-    response = requests.post(api_url, json=data,headers={**headers, "Cookie": final_cookie})
+    response = requests.post(api_url, data=body_str, headers={**headers, "Cookie": final_cookie, **dict(entry['headers'])})
 
     print(f"状态码: {response.status_code}")
     print(response.text)
