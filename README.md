@@ -6,7 +6,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/iv8)](https://pypi.org/project/iv8/)
 [![Python](https://img.shields.io/pypi/pyversions/iv8)](https://pypi.org/project/iv8/)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-blue)]()
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS%20(experimental)-blue)]()
 [![GitHub](https://img.shields.io/badge/GitHub-iv8-blue?logo=github)](https://github.com/HanZzzzz000/iv8)
 
 **iv8** 是基于 V8 引擎的高性能 Python 原生扩展，在 C++ 层实现浏览器 API，提供高可控、高保真的 BOM/DOM/CSSOM 模拟，内置 API 调用链监控与 Chrome DevTools 远程调试，可在 Python 中直接运行依赖 Web 环境的 JavaScript，无需启动浏览器。
@@ -46,11 +46,15 @@ Python 与 V8 的互操作层参考了 [STPyV8](https://github.com/cloudflare/st
 ## 快速上手
 
 ```bash
-pip install iv8
+pip install --upgrade iv8 -i https://pypi.org/simple
 ```
 
-支持 Python 3.8 – 3.14，Windows (x64)、Linux (x64)。
+建议使用 PyPI 官方源安装或升级；部分第三方镜像源可能同步延迟，暂时无法获取最新版本。
+
+支持 Python 3.9 – 3.14，Windows (x64)、Linux (x64)。
 Linux 版本通过 manylinux 标准编译，可在 CentOS、Ubuntu、Debian、Fedora 等主流发行版上运行。
+
+> **macOS（实验版）**：现提供 macOS Apple Silicon（arm64）预编译 wheel，支持 **Python 3.11–3.14、macOS 14+**。该版本经 [GitHub Releases](https://github.com/HanZzzzz000/iv8/releases) 分发，**不发布到 PyPI**。作者无 macOS 设备无法长期实测，目前为**社区实验/灰度**性质（已通过离线 API 综合自测 173/173），欢迎反馈问题。安装：从 Releases 下载对应 wheel 后 `pip install ./iv8-0.1.3-cp314-cp314-macosx_14_0_arm64.whl`。
 
 ```python
 import iv8
@@ -565,9 +569,21 @@ for t in threads:
 
 ---
 
+## 更新记录
+
+### 0.1.3
+
+- 修复 `btoa()` 对 Latin1 字符判断过窄的问题，`String.fromCharCode(0xE9)` 等 Latin1 输入现在可正常编码。
+- 修复 DevTools 本地调试地址在部分 Windows / Chrome 环境下因 `localhost` 解析到 IPv6 导致 WebSocket 断开的问题。
+- 增强 `page.load()` 解析期 `document.write()` 行为，inline script 写入的 DOM 内容现在会持久化到文档树。
+- 修复 `innerHTML` 只序列化第一个子节点的问题，现在会按顺序序列化全部子节点。
+- 新增 macOS Apple Silicon（arm64 / Python 3.11–3.14）预编译 wheel（实验版，经 GitHub Releases 分发，不上 PyPI；已通过离线 API 综合自测 173/173）。
+
+---
+
 ## 许可证
 
-iv8 社区版以编译成品形式免费提供，**不开放源代码**。
+iv8 社区版当前以编译成品形式免费提供。浏览器环境模拟本质上是一个持续对齐与攻防迭代的过程，过早开放完整源码可能会被用于针对性检测；项目会在能力持续精细化、接口与行为更加稳定后，评估逐步开放更多实现细节或源码的可能性。
 
 - 允许个人学习、研究、非商业用途免费使用
 - 禁止反编译、反汇编或以其他方式尝试获取源代码
@@ -584,4 +600,4 @@ iv8 社区版以编译成品形式免费提供，**不开放源代码**。
 
 ## 致谢
 
-- [STPyV8](https://github.com/cloudflare/stpyv8) — Python-V8 互操作层的设计参考
+- [STPyV8](https://github.com/cloudflare/stpyv8) — Python 与 V8 的互操作层参考了 STPyV8 的设计，并在其基础上进行了优化。

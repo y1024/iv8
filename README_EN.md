@@ -4,7 +4,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/iv8)](https://pypi.org/project/iv8/)
 [![Python](https://img.shields.io/pypi/pyversions/iv8)](https://pypi.org/project/iv8/)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-blue)]()
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS%20(experimental)-blue)]()
 [![GitHub](https://img.shields.io/badge/GitHub-iv8-blue?logo=github)](https://github.com/HanZzzzz000/iv8)
 
 **iv8** is a high-performance Python native extension built on the V8 engine. It implements browser APIs at the C++ level, providing highly controllable, high-fidelity BOM/DOM/CSSOM emulation with built-in API call chain monitoring and Chrome DevTools remote debugging. Run JavaScript that depends on a web environment directly in Python — no browser required.
@@ -42,11 +42,15 @@ The Python–V8 interop layer draws on the design of [STPyV8](https://github.com
 ## Quick Start
 
 ```bash
-pip install iv8
+pip install --upgrade iv8 -i https://pypi.org/simple
 ```
 
-Supports Python 3.8 – 3.14, Windows (x64), and Linux (x64).
+We recommend installing or upgrading from the official PyPI index. Some third-party mirrors may lag behind and may not have the latest release immediately.
+
+Supports Python 3.9 – 3.14, Windows (x64), and Linux (x64).
 The Linux build is compiled to the manylinux standard and runs on CentOS, Ubuntu, Debian, Fedora, and other mainstream distributions.
+
+> **macOS (experimental)**: a prebuilt wheel for macOS Apple Silicon (arm64) is now available, for **Python 3.11–3.14 and macOS 14+**. It is distributed via [GitHub Releases](https://github.com/HanZzzzz000/iv8/releases) and is **not published to PyPI**. The author has no macOS device for long-term testing, so this is a **community/experimental** build (it passes the offline comprehensive API self-test, 173/173); feedback is welcome. To install, download the wheel from Releases and run `pip install ./iv8-0.1.3-cp314-cp314-macosx_14_0_arm64.whl`.
 
 ```python
 import iv8
@@ -561,9 +565,21 @@ If the target JS does not depend on DOMContentLoaded / load events or external s
 
 ---
 
+## Changelog
+
+### 0.1.3
+
+- Fixed overly strict Latin1 validation in `btoa()`, so inputs such as `String.fromCharCode(0xE9)` now encode correctly.
+- Fixed a DevTools local debugging issue where `localhost` could resolve to IPv6 on some Windows / Chrome environments and cause the WebSocket connection to disconnect.
+- Improved parser-time `document.write()` behavior in `page.load()`, so DOM written by inline scripts is now persisted in the document tree.
+- Fixed `innerHTML` serialization only returning the first child node; it now serializes all child nodes in order.
+- Added a prebuilt macOS Apple Silicon wheel (arm64 / Python 3.11–3.14), an experimental build distributed via GitHub Releases (not on PyPI); passes the offline comprehensive API self-test (173/173).
+
+---
+
 ## License
 
-The iv8 Community Edition is distributed as pre-compiled binaries and is **not open source**.
+The iv8 Community Edition is currently distributed as pre-compiled binaries. Browser-environment emulation is an ongoing process of behavioral alignment and adversarial iteration; opening the full implementation too early may make it easier to build targeted detections. As the project becomes more refined and its interfaces and behaviors stabilize, we will evaluate gradually opening more implementation details or source code in the future.
 
 - Free for personal, educational, and non-commercial use
 - Reverse-engineering, decompilation, and disassembly are prohibited
