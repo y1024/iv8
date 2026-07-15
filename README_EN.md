@@ -47,10 +47,10 @@ pip install --upgrade iv8 -i https://pypi.org/simple
 
 We recommend installing or upgrading from the official PyPI index. Some third-party mirrors may lag behind and may not have the latest release immediately.
 
-Supports Python 3.9 – 3.14, Windows (x64), and Linux (x64).
+Supports Python 3.9 – 3.14, Windows (x64), and Linux (x64 / aarch64).
 The Linux build is compiled to the manylinux standard and runs on CentOS, Ubuntu, Debian, Fedora, and other mainstream distributions.
 
-> **macOS (experimental)**: a prebuilt wheel for macOS Apple Silicon (arm64) is now available, for **Python 3.11–3.14 and macOS 14+**. It is distributed via [GitHub Releases](https://github.com/HanZzzzz000/iv8/releases) and is **not published to PyPI**. The author has no macOS device for long-term testing, so this is a **community/experimental** build (it passes the offline comprehensive API self-test, 173/173); feedback is welcome. To install, download the wheel from Releases and run `pip install ./iv8-0.1.3-cp314-cp314-macosx_14_0_arm64.whl`.
+> **macOS**: From **0.1.4**, prebuilt macOS arm64 / x86_64 wheels (Python 3.11–3.14, macOS 14+) are published to **PyPI** together with Linux/Windows — install with `pip install iv8`. Earlier 0.1.3 macOS builds were GitHub Releases–only. The author has no macOS device for long-term testing; feedback is welcome.
 
 ```python
 import iv8
@@ -566,6 +566,19 @@ If the target JS does not depend on DOMContentLoaded / load events or external s
 ---
 
 ## Changelog
+
+### 0.1.4
+
+- Fixed Promises returned by `Response.json()` / `Response.text()` never resolving after the event loop was drained (#29).
+- Fixed `OfflineAudioContext` construction (both the `(numberOfChannels, length, sampleRate)` legacy form and the options-dictionary form) incorrectly raising "1 argument required" (#29).
+- Fixed native DOM methods with receiver brand checks (`appendChild` / `insertBefore` / `addEventListener`, …) throwing `Illegal invocation` — and some silently returning `null` — when the first `JSContext` in a process is created on a **worker thread** (#18 / #25).
+- Added `document.currentScript`: returns the executing `<script>` element during inline script execution and `null` otherwise (#23).
+- Improved `navigator.userAgentData`: `brands` and `getHighEntropyValues()` (`uaFullVersion` / `bitness` / `architecture`, …) are now configurable via `environment` and consistent with the `Sec-CH-UA*` request headers (#20).
+- Completed default values for `navigator.permissions.query()` (`usb` / `hid` / `serial` / `background-fetch` / `display-capture` / `compute-pressure` / `speaker-selection`, …), removing the "unknown environment config path" ERROR log noise (#19 / #22 / #24).
+- Fixed the WebGL `EXT_texture_filter_anisotropic` extension where `getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT)` returned `null`; it now returns a number (16 by default) (#28).
+- Fixed extra arguments in `setTimeout(fn, delay, ...args)` / `setInterval` not being forwarded to the callback (including the `eventLoop.advance` path) (#15).
+- Fixed `new URL(...).searchParams` returning `null` and related `URLSearchParams` gaps (#12).
+- Platforms: added prebuilt wheels for **Linux aarch64** and **macOS x86_64**; **macOS (arm64 / x86_64) is now published to PyPI** alongside Linux/Windows starting with this release. All platforms pass per-issue regression plus the offline comprehensive API self-test (173/173).
 
 ### 0.1.3
 

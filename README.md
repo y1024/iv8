@@ -51,10 +51,10 @@ pip install --upgrade iv8 -i https://pypi.org/simple
 
 建议使用 PyPI 官方源安装或升级；部分第三方镜像源可能同步延迟，暂时无法获取最新版本。
 
-支持 Python 3.9 – 3.14，Windows (x64)、Linux (x64)。
+支持 Python 3.9 – 3.14，Windows (x64)、Linux (x64 / aarch64)。
 Linux 版本通过 manylinux 标准编译，可在 CentOS、Ubuntu、Debian、Fedora 等主流发行版上运行。
 
-> **macOS（实验版）**：现提供 macOS Apple Silicon（arm64）预编译 wheel，支持 **Python 3.11–3.14、macOS 14+**。该版本经 [GitHub Releases](https://github.com/HanZzzzz000/iv8/releases) 分发，**不发布到 PyPI**。作者无 macOS 设备无法长期实测，目前为**社区实验/灰度**性质（已通过离线 API 综合自测 173/173），欢迎反馈问题。安装：从 Releases 下载对应 wheel 后 `pip install ./iv8-0.1.3-cp314-cp314-macosx_14_0_arm64.whl`。
+> **macOS**：自 **0.1.4** 起，macOS arm64 / x86_64 预编译 wheel（Python 3.11–3.14、macOS 14+）与 Linux/Windows 一并发布到 **PyPI**，可直接 `pip install iv8`。0.1.3 及更早的 macOS 包曾仅经 [GitHub Releases](https://github.com/HanZzzzz000/iv8/releases) 分发。作者无 macOS 设备长期实测，欢迎反馈问题。
 
 ```python
 import iv8
@@ -570,6 +570,19 @@ for t in threads:
 ---
 
 ## 更新记录
+
+### 0.1.4
+
+- 修复 `Response.json()` / `Response.text()` 返回的 Promise 在事件循环推进后仍不解析的问题（#29）。
+- 修复 `OfflineAudioContext` 构造（`(numberOfChannels, length, sampleRate)` 传统形式与 options 字典形式）误报「1 argument required」的问题（#29）。
+- 修复在**子线程**首次创建 `JSContext` 时，带 receiver 校验的原生 DOM 方法（`appendChild` / `insertBefore` / `addEventListener` 等）抛 `Illegal invocation`、部分方法静默返回 `null` 的问题（#18 / #25）。
+- 新增 `document.currentScript`：内联脚本执行期返回当前 `<script>` 元素，非执行期返回 `null`（#23）。
+- 增强 `navigator.userAgentData`：`brands`、`getHighEntropyValues()`（`uaFullVersion` / `bitness` / `architecture` 等）现可经 `environment` 配置，且与 `Sec-CH-UA*` 请求头同源（#20）。
+- 补全 `navigator.permissions.query()` 权限默认值（`usb` / `hid` / `serial` / `background-fetch` / `display-capture` / `compute-pressure` / `speaker-selection` 等），消除「未知的环境配置路径」ERROR 日志噪音（#19 / #22 / #24）。
+- 修复 WebGL `EXT_texture_filter_anisotropic` 扩展 `getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT)` 返回 `null` 的问题，现返回数值（默认 16）（#28）。
+- 修复 `setTimeout(fn, delay, ...args)` / `setInterval` 额外参数未透传给回调的问题（含 `eventLoop.advance` 路径）（#15）。
+- 修复 `new URL(...).searchParams` 返回 `null` 及 `URLSearchParams` 相关缺失（#12）。
+- 平台：新增 **Linux aarch64** 与 **macOS x86_64** 预编译 wheel；**macOS（arm64 / x86_64）自本版起随 Linux/Windows 一并发布到 PyPI**。各平台均通过逐 issue 回归 + 离线 API 综合自测（173/173）。
 
 ### 0.1.3
 
